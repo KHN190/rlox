@@ -1,0 +1,7 @@
+[package]
+name = "rlox"
+version = "0.1.0"
+authors = ["knh190 <knh190@hotmail.com>"]
+edition = "2018"
+
+[dependencies]
