@@ -3,10 +3,10 @@ use crate::chunk::{Chunk, Op};
 macro_rules! line_info {
 	( $self:expr, $bytes:expr ) => {
 		if $self.offset > 0 && 
-		   $bytes.lines[$self.offset] == $bytes.lines[$self.offset - 1] {
-			String::from("   | ")
+		   $bytes.get_line($self.offset) == $bytes.get_line($self.offset - 1) {
+			String::from("    | ")
 		} else {
-			format!(" {:4} ", $bytes.lines[$self.offset])
+			format!(" {:4} ", $bytes.get_line($self.offset))
 		}
 	}
 }
@@ -52,13 +52,11 @@ impl Disassembler {
 			},
 
 			Op::Constant => {
-				println!("OP_CONSTANT");
-				// parse Op to u8
-				if let Op::ConstantIndex(idx) = bytes.code[self.offset + 1] {
-					let line = line_info!(self, bytes);
-					print!("{:04} {}  {:04} ", self.offset + 1, line, idx);
-					println!("{}", bytes.constants[idx as usize]);
-				}
+				print!("OP_CONSTANT");
+				// parse Op to u8, usize
+				let (idx, val) = bytes.get_constant(self.offset);
+				println!("  {:04} {}", idx, val);
+
 				self.offset += 2;
 			},
 

@@ -18,6 +18,7 @@ pub struct Chunk {
 	pub code: Vec<Op>,
 	pub constants: Vec<Value>,
 	// Line information for error report
+	// compressed with run-length encoding
 	pub lines: Vec<usize>,
 	pub count: usize,
 	pub capacity: usize,
@@ -43,7 +44,7 @@ impl Chunk {
 		}
 
 		self.code.push(byte);
-		self.lines.push(line);
+		self.write_line(line);
 		self.count += 1;
 	}
 
@@ -55,5 +56,45 @@ impl Chunk {
 		self.constants.push(value);
 		Op::ConstantIndex(
 			self.constants.len() as u8 - 1)
+	}
+
+	// return constant index & value
+	pub fn get_constant(& self, offset: usize) -> (u8, Value) {
+		if let Op::ConstantIndex(idx) = self.code[offset + 1] {
+			return (idx, self.constants[idx as usize]);
+		}
+		panic!("Cannot access constant");
+	}
+
+	// run length encoding
+	// 1,1,1,3,3 -> 1,3,3,2
+	fn write_line(&mut self, ln: usize) {
+		let len = self.lines.len();
+		if len == 0 {
+			self.lines.push(ln);
+			self.lines.push(1);
+
+		} else {
+			let last_ln = self.lines[len - 2];
+			if ln == last_ln { 
+				self.lines[len - 1] += 1;
+			} else {
+				self.lines.push(ln);
+				self.lines.push(1);
+			}	
+		}
+	}
+
+	// run length decoding
+	pub fn get_line(& self, offset: usize) -> usize {
+		let len = self.lines.len();
+		let mut i = 0;
+		let mut total_op = 0;
+		while i < len {
+			total_op += self.lines[i + 1];
+			if total_op > offset { return self.lines[i]; }
+			i += 2;
+		}
+		return 0;
 	}
 }

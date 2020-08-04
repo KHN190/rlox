@@ -17,7 +17,7 @@ fn main() {
 	chk.write(constant, 0);
 
 	chk.write(Op::Return, 1);
-	chk.write(Op::Nil, 2);
+	chk.write(Op::Nil, 1);
 
 	debugger.disassemble(chk, "rlox VM");
 }
