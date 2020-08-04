@@ -54,15 +54,31 @@ impl Disassembler {
 			Op::Constant => {
 				let (idx, val) = bytes.get_constant(self.ip);
 
-				println!("OP_CONSTANT  {:04} {}", idx, val);
+				println!("OP_CONST  {:04} {}", idx, val);
 				self.ip += 2;
 			},
 			Op::Negate => {
-				println!("OP_NEGATE");
+				println!("OP_NEG");
+				self.ip += 1;
+			},
+			Op::Add => {
+				println!("OP_ADD");
+				self.ip += 1;
+			},
+			Op::Subtract => {
+				println!("OP_SUB");
+				self.ip += 1;
+			},
+			Op::Multiply => {
+				println!("OP_MUL");
+				self.ip += 1;
+			},
+			Op::Divide   => {
+				println!("OP_DIV");
 				self.ip += 1;
 			},
 			_ => {
-				println!("UNK");
+				println!("OP_UNK");
 				self.ip += 1;
 			},
 		}

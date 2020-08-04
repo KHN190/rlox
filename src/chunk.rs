@@ -8,6 +8,10 @@ pub enum Op {
 	Constant,
 	ConstantIndex(u8),
 	Negate,
+	Add,
+	Subtract,
+	Multiply,
+	Divide,
 	Return,
 	Nil,
 }
