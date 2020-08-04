@@ -52,11 +52,10 @@ impl Disassembler {
 			},
 
 			Op::Constant => {
-				print!("OP_CONSTANT");
 				// parse Op to u8, usize
 				let (idx, val) = bytes.get_constant(self.offset);
-				println!("  {:04} {}", idx, val);
 
+				println!("OP_CONSTANT  {:04} {}", idx, val);
 				self.offset += 2;
 			},
 

@@ -16,12 +16,13 @@ pub struct Chunk {
 	// compile time known length, thus
 	// you can't do sth like: let code = [0; len];
 	pub code: Vec<Op>,
-	pub constants: Vec<Value>,
-	// Line information for error report
-	// compressed with run-length encoding
-	pub lines: Vec<usize>,
 	pub count: usize,
 	pub capacity: usize,
+	// Line information for error report
+	// compressed with run-length encoding
+	lines: Vec<usize>,
+	// store constants
+	constants: Vec<Value>,
 }
 
 impl Chunk {
