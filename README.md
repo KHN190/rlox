@@ -1,7 +1,8 @@
-# rlox = Rust-made Lox
+# rlox
 
-Lox language is define in the book [Crafting Interpreters](http://www.craftinginterpreters.com/). It's in Rust.
+rlox = Rust made Lox. 
 
-# VM
+For the book[Crafting Interpreters](http://www.craftinginterpreters.com/). 
 
-It uses bytecode.
+* It's in Rust.
+* It uses bytecode.
