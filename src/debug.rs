@@ -13,19 +13,19 @@ impl Disassembler {
 		}
 	}
 
-	pub fn disassemble(mut self, chunk: &Chunk, name: &str) {
+	pub fn disassemble(mut self, ref bytes: Chunk, name: &str) {
 		println!("== {} ==", name);
 
-		// borrow the chunk
+		// borrow the chunk using `&` or `ref`
 		//   https://hellocode.dev/rust-ownership
-		let bytes = chunk;
+		//   https://doc.rust-lang.org/stable/rust-by-example/scope/borrow/ref.html
 
-		while self.offset < bytes.code.len() {
+		while self.offset < bytes.count {
 			self.disassemble_op(bytes);
 		}
 	}
 
-	pub fn disassemble_op(&mut self, bytes: &Chunk) {
+	fn disassemble_op(&mut self, bytes: &Chunk) {
 		print!("{:04} ", self.offset);
 
 		let op = &bytes.code[self.offset];
@@ -34,6 +34,17 @@ impl Disassembler {
 				println!("OP_RETURN");
 				self.offset += 1;
 			},
+
+			Op::Constant => {
+				println!("OP_CONSTANT");
+				// parse Op to u8
+				if let Op::ConstantIndex(idx) = bytes.code[self.offset + 1] {
+					print!("{:04} {:04} ", self.offset + 1, idx);
+					println!("{}", bytes.constants[idx as usize]);
+				}
+				self.offset += 2;
+			},
+
 			_ => {
 				println!("UNK");
 				self.offset += 1;
