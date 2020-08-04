@@ -2,6 +2,9 @@ use crate::chunk::*;
 use crate::debug::Disassembler;
 use crate::DEBUG_TRACE;
 
+const STACK_SIZE: usize = 4098;
+
+
 #[allow(dead_code)]
 #[repr(u8)]
 #[derive(Debug, PartialEq)]
@@ -18,6 +21,8 @@ pub struct VirtualMachine {
 	debugger: Disassembler,
 	// current op offset
 	ip: usize,
+	// store unfinished op
+	stack: Vec<Value>,
 }
 
 
@@ -26,34 +31,50 @@ impl VirtualMachine {
 		VirtualMachine {
 			debugger: Disassembler::new(),
 			ip: 0,
+			stack: Vec::with_capacity(STACK_SIZE),
 		}
 	}
 
 	// another possible way is to take the ownership,
 	//
-	// pub fn interpret(mut self, ref chunk: Chunk) { }
+	// pub fn interpret(mut self, ref bytes: Chunk) { }
 
-	pub fn interpret(mut self, chunk: &Chunk) -> InterpretResult {
+	pub fn interpret(mut self, bytes: &Chunk) -> InterpretResult {
 		self.ip = 0;
-  		self.run(chunk)
+  		self.run(bytes)
 	}
 
-	fn run(&mut self, chunk: &Chunk) -> InterpretResult {
+	fn run(&mut self, bytes: &Chunk) -> InterpretResult {
 
-		while self.ip < chunk.count {
+		while self.ip < bytes.count {
 			// print trace if debug is on
 			if DEBUG_TRACE {
-				self.debugger.disassemble_op(chunk);
+				// print stack
+				for val in self.stack.iter() {
+					print!("[{}]", val);
+				}
+				println!("");
+				// print op
+				self.debugger.disassemble_op(bytes);
 			}
 			// execute instruction
-			let op = chunk.code[self.ip];
+			let op = bytes.code[self.ip];
 			match op  {
 				Op::Return => {
+					let val = self.stack.pop().unwrap();
+
+					println!("{}", val);
 					return InterpretResult::OK 
 				},
 				Op::Constant => {
-					// let (idx, val) = chunk.get_constant(self.ip);
+					let (_, val) = bytes.get_constant(self.ip);
+					self.stack.push(val);
 					self.ip += 2;
+				},
+				Op::Negate => {
+					let val = -self.stack.pop().unwrap();
+					self.stack.push(val);
+					self.ip += 1;
 				},
 				_ => {
 					self.ip += 1

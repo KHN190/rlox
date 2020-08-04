@@ -7,6 +7,7 @@ pub enum Op {
 	// default type is Chunk::Op
 	Constant,
 	ConstantIndex(u8),
+	Negate,
 	Return,
 	Nil,
 }
@@ -121,6 +122,7 @@ impl Chunk {
 		self.count += 1;
 	}
 
+	#[allow(dead_code)]
 	pub fn clear(&mut self) {
 		self.code.clear();
 		self.constants.clear();

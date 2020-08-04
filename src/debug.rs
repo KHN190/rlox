@@ -51,15 +51,16 @@ impl Disassembler {
 				println!("OP_RETURN");
 				self.ip += 1;
 			},
-
 			Op::Constant => {
-				// parse Op to u8, usize
 				let (idx, val) = bytes.get_constant(self.ip);
 
 				println!("OP_CONSTANT  {:04} {}", idx, val);
 				self.ip += 2;
 			},
-
+			Op::Negate => {
+				println!("OP_NEGATE");
+				self.ip += 1;
+			},
 			_ => {
 				println!("UNK");
 				self.ip += 1;
