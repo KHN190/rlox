@@ -70,11 +70,7 @@ impl VirtualMachine {
 					self.stack.push(val);
 					self.ip += 2;
 				},
-				Op::Negate => {
-					let val = -self.stack.pop().unwrap();
-					self.stack.push(val);
-					self.ip += 1;
-				},
+				Op::Negate   => { unary_op!(self, -); },
 				Op::Add      => { bin_op!(self, +); },
 				Op::Subtract => { bin_op!(self, -); },
 				Op::Multiply => { bin_op!(self, *); },
