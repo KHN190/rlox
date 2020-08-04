@@ -75,30 +75,10 @@ impl VirtualMachine {
 					self.stack.push(val);
 					self.ip += 1;
 				},
-				Op::Add => {
-					let a = self.stack.pop().unwrap();
-					let b = self.stack.pop().unwrap();
-					self.stack.push(a + b);
-					self.ip += 1;
-				},
-				Op::Subtract => {
-					let a = self.stack.pop().unwrap();
-					let b = self.stack.pop().unwrap();
-					self.stack.push(a - b);
-					self.ip += 1;
-				},
-				Op::Multiply => {
-					let a = self.stack.pop().unwrap();
-					let b = self.stack.pop().unwrap();
-					self.stack.push(a * b);
-					self.ip += 1;
-				},
-				Op::Divide   => {
-					let a = self.stack.pop().unwrap();
-					let b = self.stack.pop().unwrap();
-					self.stack.push(a / b);
-					self.ip += 1;
-				},
+				Op::Add      => { bin_op!(self, +); },
+				Op::Subtract => { bin_op!(self, -); },
+				Op::Multiply => { bin_op!(self, *); },
+				Op::Divide   => { bin_op!(self, /); },
 				_ => {
 					self.ip += 1
 				},

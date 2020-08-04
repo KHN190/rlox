@@ -1,5 +1,6 @@
 #[macro_use]
-mod memory;
+mod macros;
+
 mod chunk;
 mod vm;
 mod debug;

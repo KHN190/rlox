@@ -1,6 +1,7 @@
 pub type Value = f64;
 
 
+#[allow(dead_code)]
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Op {
