@@ -16,6 +16,8 @@ pub struct Disassembler {
 	offset: usize,
 }
 
+use crate::chunk::{ConstantTrait, LineTrait};
+
 impl Disassembler {
 	pub fn new() -> Self
 	{

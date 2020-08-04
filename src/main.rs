@@ -3,8 +3,7 @@ mod memory;
 mod chunk;
 mod debug;
 
-// use chunk::*;
-use chunk::{Chunk, Op};
+use chunk::*;
 use debug::{Disassembler};
 
 fn main() {
