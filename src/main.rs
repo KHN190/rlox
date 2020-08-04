@@ -12,12 +12,12 @@ fn main() {
 
 	let mut chk = Chunk::new();
 
-	let constant = Op::ConstantIndex(chk.add_constant(1.2));
-	chk.write(Op::Constant);
-	chk.write(constant);
+	let constant = chk.add_constant(1.2);
+	chk.write(Op::Constant, 0);
+	chk.write(constant, 0);
 
-	chk.write(Op::Return);
-	chk.write(Op::Nil);
+	chk.write(Op::Return, 1);
+	chk.write(Op::Nil, 2);
 
 	debugger.disassemble(chk, "rlox VM");
 }
