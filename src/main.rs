@@ -1,14 +1,17 @@
 #[macro_use]
 mod memory;
 mod chunk;
+mod vm;
 mod debug;
 
-use chunk::*;
+#[allow(unused_imports)]
 use debug::{Disassembler};
+#[allow(unused_imports)]
+use vm::{VirtualMachine};
+
+use chunk::*;
 
 fn main() {
-	let debugger = Disassembler::new();
-
 	let mut chk = Chunk::new();
 
 	let constant = chk.add_constant(1.2);
@@ -18,5 +21,9 @@ fn main() {
 	chk.write(Op::Return, 1);
 	chk.write(Op::Nil, 1);
 
-	debugger.disassemble(chk, "rlox VM");
+	// let debugger = Disassembler::new();
+	// debugger.disassemble(chk, "rlox VM");
+
+	let vm = VirtualMachine::new();
+	vm.interpret(chk);
 }

@@ -1,7 +1,8 @@
 pub type Value = f64;
 
+
 #[repr(u8)]
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Op {
 	// default type is Chunk::Op
 	Constant,
@@ -44,6 +45,7 @@ impl ConstantTrait for Chunk {
 	}
 
 	// return constant index & value
+	//   offset: op offset in chunk
 	fn get_constant(& self, offset: usize) -> (u8, Value) {
 		if let Op::ConstantIndex(idx) = self.code[offset + 1] {
 			return (idx, self.constants[idx as usize]);

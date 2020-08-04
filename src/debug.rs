@@ -1,4 +1,4 @@
-use crate::chunk::{Chunk, Op};
+use crate::chunk::*;
 
 macro_rules! line_info {
 	( $self:expr, $bytes:expr ) => {
@@ -16,8 +16,7 @@ pub struct Disassembler {
 	offset: usize,
 }
 
-use crate::chunk::{ConstantTrait, LineTrait};
-
+#[allow(dead_code)]
 impl Disassembler {
 	pub fn new() -> Self
 	{
