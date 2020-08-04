@@ -120,4 +120,12 @@ impl Chunk {
 		self.add_line(line);
 		self.count += 1;
 	}
+
+	pub fn clear(&mut self) {
+		self.code.clear();
+		self.constants.clear();
+		self.lines.clear();
+		self.count = 0;
+		self.capacity = 0;
+	}
 }

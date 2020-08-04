@@ -4,6 +4,9 @@ mod chunk;
 mod vm;
 mod debug;
 
+#[cfg(test)]
+mod tests;
+
 #[allow(unused_imports)]
 use debug::{Disassembler};
 #[allow(unused_imports)]
@@ -15,17 +18,7 @@ pub const DEBUG_TRACE: bool = true;
 
 fn main() {
 	let mut chk = Chunk::new();
-
-	let constant = chk.add_constant(1.2);
-	chk.write(Op::Constant, 0);
-	chk.write(constant, 0);
-
-	chk.write(Op::Return, 1);
-	chk.write(Op::Nil, 1);
-
-	// let debugger = Disassembler::new();
-	// debugger.disassemble(&chk, "rlox VM");
-
 	let vm = VirtualMachine::new();
+
 	vm.interpret(&chk);
 }
