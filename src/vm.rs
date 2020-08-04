@@ -25,13 +25,10 @@ impl VirtualMachine {
 	}
 
 	// another possible way is to take the ownership,
-	// but we make API consistent with debug::Disassembler
 	//
-	// pub fn interpret(mut self, chunk: Chunk) {
-	//     self.chunk = chunk;
-	// }
+	// pub fn interpret(mut self, ref chunk: Chunk) { }
 
-	pub fn interpret(mut self, ref chunk: Chunk) -> InterpretResult {
+	pub fn interpret(mut self, chunk: &Chunk) -> InterpretResult {
 		self.ip = 0;
   		self.run(chunk)
 	}

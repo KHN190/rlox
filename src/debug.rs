@@ -25,7 +25,7 @@ impl Disassembler {
 		}
 	}
 
-	pub fn disassemble(mut self, ref bytes: Chunk, name: &str) {
+	pub fn disassemble(mut self, bytes: &Chunk, name: &str) {
 		println!("== {} ==", name);
 		println!("IDX | LINE | VALUE");
 

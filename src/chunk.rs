@@ -11,7 +11,7 @@ pub enum Op {
 	Nil,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Chunk {
 	// Rust array can only be created using 
 	// compile time known length, thus

@@ -21,9 +21,9 @@ fn main() {
 	chk.write(Op::Return, 1);
 	chk.write(Op::Nil, 1);
 
-	// let debugger = Disassembler::new();
-	// debugger.disassemble(chk, "rlox VM");
+	let debugger = Disassembler::new();
+	debugger.disassemble(&chk, "rlox VM");
 
 	let vm = VirtualMachine::new();
-	vm.interpret(chk);
+	vm.interpret(&chk);
 }
