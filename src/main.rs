@@ -11,6 +11,8 @@ use vm::{VirtualMachine};
 
 use chunk::*;
 
+pub const DEBUG_TRACE: bool = true;
+
 fn main() {
 	let mut chk = Chunk::new();
 
@@ -21,8 +23,8 @@ fn main() {
 	chk.write(Op::Return, 1);
 	chk.write(Op::Nil, 1);
 
-	let debugger = Disassembler::new();
-	debugger.disassemble(&chk, "rlox VM");
+	// let debugger = Disassembler::new();
+	// debugger.disassemble(&chk, "rlox VM");
 
 	let vm = VirtualMachine::new();
 	vm.interpret(&chk);

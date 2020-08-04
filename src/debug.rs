@@ -2,18 +2,18 @@ use crate::chunk::*;
 
 macro_rules! line_info {
 	( $self:expr, $bytes:expr ) => {
-		if $self.offset > 0 && 
-		   $bytes.get_line($self.offset) == $bytes.get_line($self.offset - 1) {
+		if $self.ip > 0 && 
+		   $bytes.get_line($self.ip) == $bytes.get_line($self.ip - 1) {
 			String::from("    | ")
 		} else {
-			format!(" {:4} ", $bytes.get_line($self.offset))
+			format!(" {:4} ", $bytes.get_line($self.ip))
 		}
 	}
 }
 
 #[derive(Debug)]
 pub struct Disassembler {
-	offset: usize,
+	ip: usize,
 }
 
 #[allow(dead_code)]
@@ -21,7 +21,7 @@ impl Disassembler {
 	pub fn new() -> Self
 	{
 		Disassembler {
-			offset: 0,
+			ip: 0,
 		}
 	}
 
@@ -33,36 +33,36 @@ impl Disassembler {
 		//   https://hellocode.dev/rust-ownership
 		//   https://doc.rust-lang.org/stable/rust-by-example/scope/borrow/ref.html
 
-		while self.offset < bytes.count {
+		while self.ip < bytes.count {
 			self.disassemble_op(bytes);
 		}
 	}
 
-	fn disassemble_op(&mut self, bytes: &Chunk) {
-		print!("{:04} ", self.offset);
+	pub fn disassemble_op(&mut self, bytes: &Chunk) {
+		print!("{:04} ", self.ip);
 
 		// print line number
 		let line = line_info!(self, bytes);
 		print!("{}  ", line);
 
-		let op = &bytes.code[self.offset];
+		let op = &bytes.code[self.ip];
 		match op {
 			Op::Return => {
 				println!("OP_RETURN");
-				self.offset += 1;
+				self.ip += 1;
 			},
 
 			Op::Constant => {
 				// parse Op to u8, usize
-				let (idx, val) = bytes.get_constant(self.offset);
+				let (idx, val) = bytes.get_constant(self.ip);
 
 				println!("OP_CONSTANT  {:04} {}", idx, val);
-				self.offset += 2;
+				self.ip += 2;
 			},
 
 			_ => {
 				println!("UNK");
-				self.offset += 1;
+				self.ip += 1;
 			},
 		}
 	}
