@@ -2,6 +2,12 @@
 name = "rlox"
 version = "0.1.0"
 authors = ["knh190 <knh190@hotmail.com>"]
+description = "Rust implementation of the Lox language interpreter"
+repository = "https://github.com/KHN190/rlox"
 edition = "2018"
 
 [dependencies]
+
+[[bin]]
+name = "rlox"
+doc = false

@@ -1,21 +1,17 @@
 #[macro_use]
 mod macros;
 
-mod chunk;
-mod debug;
-mod vm;
+pub mod chunk;
+pub mod debug;
+pub mod vm;
 
 #[cfg(test)]
 mod tests;
 
-#[allow(unused_imports)]
-use debug::Disassembler;
-#[allow(unused_imports)]
-use vm::VirtualMachine;
-
-use chunk::*;
-
 pub const DEBUG_TRACE: bool = true;
+
+use vm::VirtualMachine;
+use chunk::*;
 
 fn main() {
     let mut chk = Chunk::new();
