@@ -16,7 +16,7 @@ pub enum Op {
     Nil,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct Chunk {
     // Rust array can only be created using
     // compile time known length, thus
@@ -94,7 +94,7 @@ impl LineTrait for Chunk {
             }
             i += 2;
         }
-        return 0;
+        0
     }
 }
 

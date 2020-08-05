@@ -6,14 +6,14 @@ const STACK_SIZE: usize = 4098;
 
 #[allow(dead_code)]
 #[repr(u8)]
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, Copy, PartialEq)]
 pub enum InterpretResult {
     OK,
     CompileError,
     RuntimeError,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct VirtualMachine {
     // debug
     debugger: Disassembler,
@@ -49,7 +49,7 @@ impl VirtualMachine {
                 for val in self.stack.iter() {
                     print!("[{}]", val);
                 }
-                println!("");
+                println!();
                 // print op
                 self.debugger.disassemble_op(bytes);
             }

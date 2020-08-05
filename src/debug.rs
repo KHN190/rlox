@@ -1,6 +1,6 @@
 use crate::chunk::*;
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Disassembler {
     ip: usize,
 }
