@@ -2,9 +2,9 @@
 mod macros;
 
 mod chunk;
-mod run;
-
 pub mod debug;
+mod run;
+mod scan;
 pub mod vm;
 
 pub const DEBUG_TRACE: bool = true;

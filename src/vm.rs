@@ -4,7 +4,6 @@ use crate::DEBUG_TRACE;
 
 const STACK_SIZE: usize = 4098;
 
-#[allow(dead_code)]
 #[repr(u8)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum InterpretResult {
