@@ -126,10 +126,13 @@ impl Scanner {
     fn skip_white_space(&mut self) {
         loop {
             let cur = self.peek();
-            if cur == '\r' || cur == '\t' || cur == ' ' {
-                self.current += 1;
-            } else {
-                break;
+            match cur {
+            	'\r' | '\t' | ' ' => self.current += 1,
+            	'\n' => {
+            		self.line += 1;
+            		self.current += 1;
+            	}
+            	_ => break,
             }
         }
     }
