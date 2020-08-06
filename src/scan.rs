@@ -1,6 +1,5 @@
 macro_rules! token {
     ( $self:ident, $val:literal, $tt:expr ) => {
-        // Token::new($tt, $val, $self.line)
         Token {
             tt: $tt,
             value: $val,
@@ -9,9 +8,19 @@ macro_rules! token {
     };
 }
 
+macro_rules! if_then_token {
+    ( $self:ident, $if:literal, $then_val:literal, $then:expr, $else_val:literal, $else:expr ) => {
+        if $self.expect($if) {
+            token!($self, $then_val, $then)
+        } else {
+            token!($self, $else_val, $else)
+        }
+    };
+}
+
 #[rustfmt::skip]
 #[allow(dead_code)]
-#[repr(u8)]
+#[repr(u16)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TokenType {
 	// Single-character tokens.
@@ -68,8 +77,9 @@ impl Scanner {
     }
 
     pub fn next(&mut self) -> Token {
-        self.current += 1;
+        self.skip_white_space();
 
+        self.current += 1;
         if self.current > self.source.len() {
             return token!(self, "EOF", TokenType::Eof);
         } else {
@@ -77,12 +87,50 @@ impl Scanner {
             match cur {
                 '(' => token!(self, "(", TokenType::LeftParen),
                 ')' => token!(self, ")", TokenType::RightParen),
+                '{' => token!(self, "{", TokenType::LeftBrace),
+                '}' => token!(self, "}", TokenType::RightBrace),
+                ';' => token!(self, ";", TokenType::Semicolon),
+                ',' => token!(self, ",", TokenType::Comma),
+                '.' => token!(self, ".", TokenType::Dot),
+                '-' => token!(self, "-", TokenType::Minus),
+                '+' => token!(self, "+", TokenType::Plus),
+                '/' => token!(self, "/", TokenType::Slash),
+                '*' => token!(self, "*", TokenType::Star),
+
+                '!' => if_then_token!(self, '=', "!=", TokenType::BangEqual, "!", TokenType::Bang),
+                '=' => if_then_token!(self, '=', "==", TokenType::EqualEqual, "=", TokenType::Equal),
+                '<' => if_then_token!(self, '=', "<=", TokenType::LessEqual, "<", TokenType::Less),
+                '>' => if_then_token!(self, '=', ">=", TokenType::GreaterEqual, ">", TokenType::Greater),
+
                 _ => token!(self, "UNK", TokenType::Error),
             }
         }
     }
 
-    pub fn peek(&mut self) -> char {
-        panic!("not implemented");
+    fn peek(&self) -> char {
+        if self.current >= self.source.len() {
+            return '\0';
+        }
+        self.source[self.current]
+    }
+
+    // see if next char matches expect
+    fn expect(&mut self, expect: char) -> bool {
+        if expect == '\0' || self.peek() != expect {
+            return false;
+        }
+        self.current += 1;
+        true
+    }
+
+    fn skip_white_space(&mut self) {
+        loop {
+            let cur = self.peek();
+            if cur == '\r' || cur == '\t' || cur == ' ' {
+                self.current += 1;
+            } else {
+                break;
+            }
+        }
     }
 }
