@@ -133,7 +133,7 @@ impl Scanner {
                     self.line += 1;
                     self.current += 1;
                     break;
-                },
+                }
                 _ => self.current += 1,
             }
         }
@@ -144,13 +144,18 @@ impl Scanner {
         loop {
             let cur = self.peek();
             match cur {
-            	'\r' | '\t' | ' ' => self.current += 1,
-            	'\n' => {
-            		self.line += 1;
-            		self.current += 1;
-            	},
-                '/' => { if self.peek_next() == '/' { self.skip_comment(); } },
-            	_ => break,
+                '\r' | '\t' | ' ' => self.current += 1,
+                '\n' => {
+                    self.line += 1;
+                    self.current += 1;
+                }
+                '/' => {
+                    if self.peek_next() != '/' {
+                        break;
+                    }
+                    self.skip_comment();
+                }
+                _ => break,
             }
         }
     }
@@ -176,7 +181,7 @@ impl Scanner {
     }
 
     fn _string(&self, start: usize, end: usize) -> String {
-        self.source[start..end].into_iter().collect::<String>()
+        self.source[start..end].iter().collect::<String>()
     }
 
     // handle number
