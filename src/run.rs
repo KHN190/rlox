@@ -1,10 +1,9 @@
-// use crate::vm::VirtualMachine;
+use crate::DEBUG_LEXER;
 
-use crate::scan::{Scanner, TokenType};
-use crate::vm::InterpretResult;
-
-// let vm = VirtualMachine::new();
-// let scanner = Scanner::default();
+use crate::chunk::Chunk;
+use crate::compiler::*;
+use crate::lexer::*;
+use crate::vm::*;
 
 #[allow(dead_code)]
 pub fn repl() {
@@ -53,25 +52,43 @@ pub fn run_file(filename: &str) {
 }
 
 fn interpret(source: &str) -> InterpretResult {
-    compile(source);
-    InterpretResult::OK
+    let mut chk = Chunk::new();
+
+    if !compile(source, &chk) {
+        return InterpretResult::CompileError;
+    }
+    VirtualMachine::new().interpret(&chk)
 }
 
-fn compile(source: &str) {
-    let mut scanner = Scanner::new(source);
+fn compile(source: &str, bytes: &Chunk) -> bool {
     let mut line = usize::MAX;
-    loop {
-        let token = scanner.next();
-        if token.line != line {
-            print!("[line {:4}] ", token.line);
-            line = token.line;
-        } else {
-            print!("          | ");
-        }
-        println!("{:?} {}", token.tt, token.value);
+    let mut no_err = true;
 
-        if let TokenType::Eof = token.tt {
-            break;
+    if DEBUG_LEXER {
+        loop {
+            let mut scanner = Scanner::new(source);
+            let token = scanner.next();
+
+            if token.line != line {
+                print!("[line {:4}] ", token.line);
+                line = token.line;
+            } else {
+                print!("          | ");
+            }
+            println!("{:?} {}", token.tt, token.value);
+
+            if let TokenType::Error = token.tt {
+                no_err = false;
+            }
+            if let TokenType::Eof = token.tt {
+                break;
+            }
         }
+    } else {
+        let mut scanner = Scanner::new(source);
+        let mut parser = Parser::new(&mut scanner);
+
+        parser.advance();
     }
+    !no_err
 }

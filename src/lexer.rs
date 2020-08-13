@@ -30,37 +30,31 @@ pub enum TokenType {
 }
 
 #[derive(Debug, Clone)]
-pub struct Token<'a> {
+pub struct Token<'src> {
     pub tt: TokenType,
     // avoid local String is freed before return
-    pub value: Cow<'a, str>,
+    pub value: Cow<'src, str>,
     pub line: usize,
 }
 
 #[derive(Debug)]
-pub struct Scanner {
-    pub source: Vec<char>,
+pub struct Scanner<'src> {
+    pub source: &'src [u8],
     pub current: usize,
     pub line: usize,
 }
 
-impl Default for Scanner {
-    fn default() -> Scanner {
-        Scanner::new("")
-    }
-}
-
-impl Scanner {
-    pub fn new(text: &str) -> Scanner {
+impl<'src> Scanner<'src> {
+    pub fn new(text: &'src str) -> Scanner<'src> {
         Scanner {
-            source: text.chars().collect(),
+            source: text.as_bytes(),
             current: 0,
             line: 0,
         }
     }
 
     #[rustfmt::skip]
-    pub fn next(&mut self) -> Token {
+    pub fn next(&mut self) -> Token<'static> {
         self.skip_white_space();
 
         if self.at_end() {
@@ -70,49 +64,49 @@ impl Scanner {
 
         let cur = self.source[self.current - 1];
         match cur {
-            '(' => token!(self, "(", TokenType::LeftParen),
-            ')' => token!(self, ")", TokenType::RightParen),
-            '{' => token!(self, "{", TokenType::LeftBrace),
-            '}' => token!(self, "}", TokenType::RightBrace),
-            ';' => token!(self, ";", TokenType::Semicolon),
-            ',' => token!(self, ",", TokenType::Comma),
-            '.' => token!(self, ".", TokenType::Dot),
-            '-' => token!(self, "-", TokenType::Minus),
-            '+' => token!(self, "+", TokenType::Plus),
-            '/' => token!(self, "/", TokenType::Slash),
-            '*' => token!(self, "*", TokenType::Star),
+            b'(' => token!(self, "(", TokenType::LeftParen),
+            b')' => token!(self, ")", TokenType::RightParen),
+            b'{' => token!(self, "{", TokenType::LeftBrace),
+            b'}' => token!(self, "}", TokenType::RightBrace),
+            b';' => token!(self, ";", TokenType::Semicolon),
+            b',' => token!(self, ",", TokenType::Comma),
+            b'.' => token!(self, ".", TokenType::Dot),
+            b'-' => token!(self, "-", TokenType::Minus),
+            b'+' => token!(self, "+", TokenType::Plus),
+            b'/' => token!(self, "/", TokenType::Slash),
+            b'*' => token!(self, "*", TokenType::Star),
 
-            '!' => if_then_token!(self, '=', "!=", TokenType::BangEqual, "!", TokenType::Bang),
-            '=' => if_then_token!(self, '=', "==", TokenType::EqualEqual, "=", TokenType::Equal),
-            '<' => if_then_token!(self, '=', "<=", TokenType::LessEqual, "<", TokenType::Less),
-            '>' => if_then_token!(self, '=', ">=", TokenType::GreaterEqual, ">", TokenType::Greater),
+            b'!' => if_then_token!(self, b'=', "!=", TokenType::BangEqual, "!", TokenType::Bang),
+            b'=' => if_then_token!(self, b'=', "==", TokenType::EqualEqual, "=", TokenType::Equal),
+            b'<' => if_then_token!(self, b'=', "<=", TokenType::LessEqual, "<", TokenType::Less),
+            b'>' => if_then_token!(self, b'=', ">=", TokenType::GreaterEqual, ">", TokenType::Greater),
 
-            '"' => self.string(),
+            b'"' => self.string(),
 
-            '0'..='9' => self.number(),
-            'A'..='Z' | 'a'..='z' | '_' => self.identifier(),
+            b'0'..=b'9' => self.number(),
+            b'A'..=b'Z' | b'a'..=b'z' | b'_' => self.identifier(),
 
             _ => token!(self, "UNK", TokenType::Error),
         }
     }
 
-    fn peek(&self) -> char {
+    fn peek(&self) -> u8 {
         if self.at_end() {
-            return '\0';
+            return b'\0';
         }
         self.source[self.current]
     }
 
-    fn peek_next(&self) -> char {
+    fn peek_next(&self) -> u8 {
         if self.current + 1 >= self.source.len() {
-            return '\0';
+            return b'\0';
         }
         self.source[self.current + 1]
     }
 
     // see if next char matches expect
-    fn expect(&mut self, expect: char) -> bool {
-        if expect == '\0' || self.peek() != expect {
+    fn expect(&mut self, expect: u8) -> bool {
+        if expect == b'\0' || self.peek() != expect {
             return false;
         }
         self.current += 1;
@@ -129,7 +123,7 @@ impl Scanner {
         loop {
             let cur = self.peek();
             match cur {
-                '\n' | '\0' => {
+                b'\n' | b'\0' => {
                     self.line += 1;
                     self.current += 1;
                     break;
@@ -144,13 +138,13 @@ impl Scanner {
         loop {
             let cur = self.peek();
             match cur {
-                '\r' | '\t' | ' ' => self.current += 1,
-                '\n' => {
+                b'\r' | b'\t' | b' ' => self.current += 1,
+                b'\n' => {
                     self.line += 1;
                     self.current += 1;
                 }
-                '/' => {
-                    if self.peek_next() != '/' {
+                b'/' => {
+                    if self.peek_next() != b'/' {
                         break;
                     }
                     self.skip_comment();
@@ -161,11 +155,11 @@ impl Scanner {
     }
 
     // handle string
-    fn string(&mut self) -> Token {
+    fn string(&mut self) -> Token<'static> {
         let start = self.current;
 
-        while self.peek() != '"' && !self.at_end() {
-            if self.peek() == '\n' {
+        while self.peek() != b'"' && !self.at_end() {
+            if self.peek() == b'\n' {
                 self.line += 1;
             }
             self.current += 1;
@@ -181,19 +175,20 @@ impl Scanner {
     }
 
     fn _string(&self, start: usize, end: usize) -> String {
-        self.source[start..end].iter().collect::<String>()
+        // self.source[start..end].iter().collect::<String>()
+        String::from(std::str::from_utf8(&self.source[start..end]).unwrap())
     }
 
     // handle number
-    fn number(&mut self) -> Token {
+    fn number(&mut self) -> Token<'static> {
         let start = self.current - 1;
 
-        while let '0'..='9' = self.peek() {
+        while self._is_digit(self.peek()) {
             self.current += 1; // for digit
         }
-        if self.peek() == '.' && self._is_digit(self.peek_next()) {
-            self.current += 1; // for '.'
-            while let '0'..='9' = self.peek() {
+        if self.peek() == b'.' && self._is_digit(self.peek_next()) {
+            self.current += 1; // for b'.'
+            while self._is_digit(self.peek()) {
                 self.current += 1;
             }
         }
@@ -203,7 +198,7 @@ impl Scanner {
     }
 
     // handle identifier
-    fn identifier(&mut self) -> Token {
+    fn identifier(&mut self) -> Token<'static> {
         let start = self.current - 1;
 
         while self._is_alpha(self.peek()) || self._is_digit(self.peek()) {
@@ -242,16 +237,16 @@ impl Scanner {
     }
 
     // utils
-    fn _is_alpha(&self, cur: char) -> bool {
+    fn _is_alpha(&self, cur: u8) -> bool {
         match cur {
-            'A'..='Z' | 'a'..='z' | '_' => true,
+            b'A'..=b'Z' | b'a'..=b'z' | b'_' => true,
             _ => false,
         }
     }
 
-    fn _is_digit(&self, cur: char) -> bool {
+    fn _is_digit(&self, cur: u8) -> bool {
         match cur {
-            '0'..='9' => true,
+            b'0'..=b'9' => true,
             _ => false,
         }
     }

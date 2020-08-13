@@ -2,7 +2,7 @@
 pub mod vm;
 
 #[macro_use]
-pub mod scan;
+pub mod lexer;
 
 // generic macros
 
