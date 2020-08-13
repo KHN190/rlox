@@ -54,13 +54,13 @@ pub fn run_file(filename: &str) {
 fn interpret(source: &str) -> InterpretResult {
     let mut chk = Chunk::new();
 
-    if !compile(source, &chk) {
+    if !compile(source, &mut chk) {
         return InterpretResult::CompileError;
     }
     VirtualMachine::new().interpret(&chk)
 }
 
-fn compile(source: &str, bytes: &Chunk) -> bool {
+fn compile(source: &str, bytes: &mut Chunk) -> bool {
     let mut line = usize::MAX;
     let mut no_err = true;
 
@@ -84,11 +84,20 @@ fn compile(source: &str, bytes: &Chunk) -> bool {
                 break;
             }
         }
+
     } else {
         let mut scanner = Scanner::new(source);
         let mut parser = Parser::new(&mut scanner);
 
         parser.advance();
+        parser.expression();
+        parser.consume(TokenType::Eof, "Expect end of expression.");
+        
+        if parser.had_error {
+            no_err = false;
+        } else {
+            parser.end_compile(bytes);
+        }
     }
     !no_err
 }
